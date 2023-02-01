@@ -5,10 +5,10 @@ import {
   type DefaultSession,
 } from "next-auth";
 import DiscordProvider from "next-auth/providers/discord";
+import GoogleProvider from "next-auth/providers/google";
 import { PrismaAdapter } from "@next-auth/prisma-adapter";
 import { env } from "../env/server.mjs";
 import { prisma } from "./db";
-
 /**
  * Module augmentation for `next-auth` types
  * Allows us to add custom properties to the `session` object
@@ -37,6 +37,9 @@ declare module "next-auth" {
  **/
 export const authOptions: NextAuthOptions = {
   callbacks: {
+    async signIn() {
+      return true;
+    },
     session({ session, user }) {
       if (session.user) {
         session.user.id = user.id;
@@ -50,6 +53,10 @@ export const authOptions: NextAuthOptions = {
     DiscordProvider({
       clientId: env.DISCORD_CLIENT_ID,
       clientSecret: env.DISCORD_CLIENT_SECRET,
+    }),
+    GoogleProvider({
+      clientId: env.GOGGLE_CLIENT_ID as string,
+      clientSecret: env.GOGGLE_CLIENT_SECRET as string,
     }),
     /**
      * ...add more providers here
